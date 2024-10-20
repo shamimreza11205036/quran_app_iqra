@@ -1,12 +1,27 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function UserHome() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const navigation = useNavigation();
   const route = useRoute();
   const { email } = route.params || {}; // Get email from navigation params
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        setIsAuthenticated(!!token); // Set to true if token exists, false otherwise
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -19,13 +34,22 @@ export default function UserHome() {
     }
   };
 
+  if (isAuthenticated === null) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.welcomeText}>Welcome, {email}!</Text>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
+      {isAuthenticated ? (
+        <>
+          <Text style={styles.welcomeText}>Welcome, {email}!</Text>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Text style={styles.welcomeText}>Please log in to access this page.</Text>
+      )}
     </View>
   );
 }

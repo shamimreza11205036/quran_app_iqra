@@ -1,52 +1,81 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { NavigationProp } from '@react-navigation/native';
+
+// Define the type for your navigation stack
+type RootStackParamList = {
+  UserHome: { email: string };
+  Signup: undefined;
+};
+
+// Define the navigation prop type
+type LoginScreenNavigationProp = NavigationProp<RootStackParamList, 'UserHome'>;
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', 'All fields are required');
       return;
     }
-
+  
     setLoading(true);
-
+    console.log('Attempting to log in with:', email, password);
+  
     try {
       const response = await axios.post('http://localhost:8000/api/login', {
         email,
         password,
       });
-
+  
       if (response.data.token) {
-        // Store token and email in AsyncStorage
+        // Store token in AsyncStorage
         await AsyncStorage.setItem('token', response.data.token);
-        await AsyncStorage.setItem('email', email);
-
+  
         setLoading(false);
+        // Show success alert
+        Alert.alert('Success', 'You have successfully logged in.');
         // Navigate to UserHome and pass the email
         navigation.navigate('UserHome', { email });
+
+        // Call fetchData to verify token usage
+        fetchData();
       } else {
         Alert.alert('Error', 'Login failed. Please try again.');
         setLoading(false);
       }
     } catch (error) {
       console.error('Login error:', error.response ? error.response.data : error.message);
-      if (error.response && error.response.data.errors) {
-        // Show Laravel validation errors
-        Alert.alert('Error', JSON.stringify(error.response.data.errors));
-      } else {
-        Alert.alert('Error', 'An error occurred during login.');
-      }
+      Alert.alert('Error', 'An error occurred during login.');
       setLoading(false);
     }
   };
+
+  const fetchData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        const response = await axios.get('http://localhost:8000/api/user', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('Protected data:', response.data);
+      } else {
+        console.log('No token found');
+      }
+    } catch (error) {
+      console.error('Error fetching protected data:', error);
+    }
+  };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -56,7 +85,7 @@ export default function Login() {
         <TextInput
           style={styles.input}
           placeholder="Email"
-          keyboardType="email-address"
+          inputMode="email"
           value={email}
           onChangeText={setEmail}
         />
@@ -69,17 +98,17 @@ export default function Login() {
         />
       </View>
 
-      <TouchableOpacity
+      <Pressable
         style={styles.loginButton}
         onPress={handleLogin}
         disabled={loading}
       >
         <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Login'}</Text>
-      </TouchableOpacity>
+      </Pressable>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+      <Pressable onPress={() => navigation.navigate('Signup')}>
         <Text style={styles.signupLink}>Don't have an account? Sign Up</Text>
-      </TouchableOpacity>
+      </Pressable>
     </ScrollView>
   );
 }

@@ -16,7 +16,10 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    return response()->json([
+        'message' => 'You have accessed a protected route!',
+        'user' => $request->user(),
+    ]);
 });
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
