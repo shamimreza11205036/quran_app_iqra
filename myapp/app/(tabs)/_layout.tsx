@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Platform, StatusBar } from 'react-native';
-import { Tabs } from 'expo-router';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon'; // Ensure TabBarIcon is defined
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+// _layout.tsx
+import React, { useState, ReactNode } from 'react'; // Import ReactNode
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, StatusBar, Image } from 'react-native';
 
 const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -14,17 +11,18 @@ const Header = () => {
 
   return (
     <View style={styles.header}>
-      <Text style={styles.logo}>ABN Bangla Quran</Text>
-      <TouchableOpacity onPress={toggleDropdown} style={styles.menuButton}>
-        <Text style={styles.menuIcon}>☰</Text>
-      </TouchableOpacity>
+      <Image source={require('../../components/icons/IQRA.png')} style={styles.logo} />
+      <View style={styles.headerRight}>
+        <Image source={require('../../components/icons/avatar-man-muslim-svgrepo-com 1 1.png')} style={styles.headerIcon} />
+        <Image source={require('../../components/icons/Group_41.svg')} style={styles.headerIcon3bar} />
+      </View>
       {showDropdown && (
         <View style={styles.dropdown}>
           <TouchableOpacity style={styles.dropdownItem}>
             <Text>About</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.dropdownItem}>
-            <Text>Quran</Text>
+            <Text>Settings</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -32,70 +30,55 @@ const Header = () => {
   );
 };
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+// Define the props for TabLayout
+interface TabLayoutProps {
+  children: ReactNode; // Explicitly type children
+}
 
+export default function TabLayout({ children }: TabLayoutProps) { // Use the defined type
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
+
+      {/* Fixed Header */}
       <Header />
-      <Tabs>
-  <Tabs.Screen
-    name="index"
-    options={{
-      title: 'Home',
-      tabBarIcon: ({ color, focused }) => (
-        <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-      ),
-    }}
-  />
-  
-  <Tabs.Screen
-    name="quran"
-    options={{
-      title: 'Quran',
-      tabBarIcon: ({ color, focused }) => (
-        <TabBarIcon name={focused ? 'book' : 'book-outline'} color={color} />
-      ),
-    }}
-  />
 
-  <Tabs.Screen
-    name="hadis"
-    options={{
-      title: 'Hadis',
-      tabBarIcon: ({ color, focused }) => (
-        <TabBarIcon name={focused ? 'document-text' : 'document-text-outline'} color={color} />
-      ),
-    }}
-  />
-  
-  <Tabs.Screen
-    name="search"
-    options={{
-      title: 'Search',
-      tabBarIcon: ({ color, focused }) => (
-        <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
-      ),
-    }}
-  />
+      {/* Scrollable Content Area */}
+      <ScrollView contentContainerStyle={styles.content}>
+        {children} {/* Render children passed from HomeScreen */}
+      </ScrollView>
 
-  {/* Conditionally render Para tab */}
-  {false && ( // Set to false to hide this tab
-    <Tabs.Screen
-      name="para"
-      options={{
-        title: 'Para',
-        tabBarIcon: ({ color, focused }) => (
-          <TabBarIcon name={focused ? 'menu' : 'menu-outline'} color={color} />
-        ),
-      }}
-    />
-  )}
-
-</Tabs>
-
-
+      {/* Fixed Footer */}
+      <View style={styles.footer}>
+      <TouchableOpacity style={styles.footerButton}>
+        <Image 
+          source={require('../../components/icons/Vector.png')} 
+          style={styles.footerIcon} 
+        />
+        <Text style={styles.footerLabel}>Home</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton}>
+        <View style={styles.quranIconWrapper}>
+          <Image 
+            source={require('../../components/icons/Group 1171274955.png')} 
+            style={styles.quranIcon} 
+          />
+          <Text style={styles.footerLabel}>কুরআন</Text>
+          <Image 
+            source={require('../../components/icons/Rectangle 3584.png')} 
+            style={styles.quranIconOverlay} 
+          />
+        </View>
+        
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.footerButton}>
+        <Image 
+          source={require('../../components/icons/Vector (1).png')} 
+          style={styles.icon} 
+        />
+        <Text style={styles.footerLabel}>Search</Text>
+      </TouchableOpacity>
+    </View>
     </SafeAreaView>
   );
 }
@@ -103,8 +86,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    backgroundColor: '#111',
   },
   header: {
     position: 'absolute',
@@ -112,7 +94,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 60,
-    backgroundColor: '#fff',
+    backgroundColor: '#333',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -124,18 +106,35 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   logo: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    width: 100,
+    height: 40,
+    resizeMode: 'contain',
   },
-  menuButton: {
-    zIndex: 1000,
+  headerRight: {
+    flexDirection: 'row',
   },
-  menuIcon: {
-    fontSize: 28,
+  headerButton: {
+    marginLeft: 16,
+  },
+  headerIcon: {
+    width: 24,
+    height: 24,
+    marginLeft: 16,
+  },
+  headerIcon3bar: {
+    width: 24,
+    height: 22,
+    marginLeft: 16,
+  },
+  // Removed invalid properties for Image component
+  icon: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
   dropdown: {
     position: 'absolute',
-    top: 50,
+    top: 60,
     right: 16,
     backgroundColor: '#fff',
     borderRadius: 5,
@@ -150,21 +149,48 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
+  content: {
+    paddingTop: 70, // Space for fixed header
+    paddingBottom: 70, // Space for fixed footer
+  },
   footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: Platform.OS === 'ios' ? 80 : 60,
-    backgroundColor: '#fff',
+    height: 60,
+    backgroundColor: '#111111',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#ccc',
+    borderTopColor: '#333333',
+  },
+  footerButton: {
+    alignItems: 'center',
+  },
+  footerIcon: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
+  },
+  quranIconWrapper: {
+    position: 'relative',
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quranIcon: {
+    width: 50,
+    height: 24,
+    resizeMode: 'contain',
+  },
+  quranIconOverlay: {
+    position: 'absolute',
+    width: 200,
+    height: 50,
+    resizeMode: 'contain',
   },
   footerLabel: {
     fontSize: 12,
-    marginBottom: Platform.OS === 'ios' ? 20 : 0,
-  },
-  footerIcon: {
-    marginBottom: 5,
-  },
+    color: '#8DC63F',
+    marginTop: 4,
+  }
 });
