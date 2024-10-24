@@ -75,23 +75,23 @@ export default function Login() {
       console.error('Error fetching protected data:', error);
     }
   };
-  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>Log in to your account</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Email"
+          placeholder="Enter your email"
           inputMode="email"
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder="Enter your password"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -103,7 +103,7 @@ export default function Login() {
         onPress={handleLogin}
         disabled={loading}
       >
-        <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+        <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Log In'}</Text>
       </Pressable>
 
       <Pressable onPress={() => navigation.navigate('Signup')}>
@@ -118,12 +118,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: 20,
+    backgroundColor: '#0E0E0E', // Light background
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 24,
+    color: '#fff', // Darker color for the title
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#777', // Subtle color for subtitle
+    marginBottom: 30,
   },
   inputContainer: {
     width: '100%',
@@ -132,27 +139,37 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    width: '100%',
+    borderColor: '#ddd',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+    backgroundColor: '#FFF', // White background for inputs
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 3,
   },
   loginButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: '#90BE46',
+    paddingVertical: 14,
+    borderRadius: 10,
     width: '100%',
     alignItems: 'center',
-    marginBottom: 15,
+    shadowColor: '#007BFF',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 5,
+    elevation: 4,
   },
   loginButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#FFF',
+    fontSize: 18,
     fontWeight: 'bold',
   },
   signupLink: {
-    color: '#007BFF',
-    textAlign: 'center',
+    color: '#90BE46',
+    marginTop: 20,
+    fontSize: 16,
   },
 });
